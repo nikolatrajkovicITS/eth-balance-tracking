@@ -4,35 +4,34 @@ import { Container, Box } from '@mui/material';
 import { AddressInputModal } from '@/src/components/molecules/AddressInputModal';
 import { AddressTokenBalancesTable } from '@/src/components/organisms/AddressTokenBalancesTable';
 import { PrimaryButton } from '@/src/components/atoms/PrimaryButton';
+import { ActionType, useTokenBalance } from '../context/TokenBalanceContext';
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const { state, dispatch } = useTokenBalance();
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
 
   const handleSubmitAddress = (address: string) => {
-    console.log(address);
+    const tokenBalances = [
+      { name: 'USDC', balance: '1000' },
+      { name: 'USDT', balance: '1500' },
+      { name: 'DAI', balance: '750' },
+    ];
+
+    dispatch({
+      type: ActionType.SET_BALANCES,
+      payload: { address, balances: tokenBalances },
+    });
+
+    setModalOpen(false);
   };
 
-  const addressTokenBalances = [
-    {
-      address: '0xABC123...',
-      balances: [
-        { name: 'USDC', balance: '1000' },
-        { name: 'USDT', balance: '500' },
-        { name: 'DAI', balance: '750' },
-      ],
-    },
-    {
-      address: '0xDEF456...',
-      balances: [
-        { name: 'USDC', balance: '2000' },
-        { name: 'USDT', balance: '1500' },
-        { name: 'DAI', balance: '1750' },
-      ],
-    },
-  ];
+  const addressTokenBalances = state.addresses.map(address => ({
+    address,
+    balances: state.tokenBalances[address] || [],
+  }));
 
   return (
     <Container maxWidth="md">

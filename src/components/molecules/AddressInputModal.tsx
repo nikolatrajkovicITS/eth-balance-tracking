@@ -30,6 +30,7 @@ export const AddressInputModal: FC<AddressInputModalProps> = ({
   const handleSubmit = () => {
     onSubmit(address);
     onClose();
+    setAddress('');
   };
 
   return (
@@ -50,8 +51,12 @@ export const AddressInputModal: FC<AddressInputModalProps> = ({
       </DialogContent>
 
       <DialogActions>
-        <PrimaryButton onClick={onClose}>Cancel</PrimaryButton>
-        <PrimaryButton onClick={handleSubmit}>Add</PrimaryButton>
+        <PrimaryButton type="button" onClick={onClose}>
+          Cancel
+        </PrimaryButton>
+        <PrimaryButton type="button" onClick={handleSubmit}>
+          Add
+        </PrimaryButton>
       </DialogActions>
     </DialogStyled>
   );
