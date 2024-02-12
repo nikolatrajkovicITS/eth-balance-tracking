@@ -1,37 +1,50 @@
-import { FC, createContext, useReducer, useContext, ReactNode } from 'react';
+import {
+  FC,
+  createContext,
+  useReducer,
+  useContext,
+  ReactNode,
+  Dispatch,
+} from 'react';
 
 export interface TokenBalance {
   name: string;
   balance: string;
 }
 
+interface AddressTokenBalances {
+  address: string;
+  balances: TokenBalance[];
+}
+
 interface State {
-  addresses: string[];
-  tokenBalances: { [address: string]: TokenBalance[] };
+  addressTokenBalances: AddressTokenBalances[];
 }
 
 export enum ActionType {
-  ADD_ADDRESS = 'ADD_ADDRESS',
-  REMOVE_ADDRESS = 'REMOVE_ADDRESS',
-  SET_BALANCES = 'SET_BALANCES',
+  REMOVE_BALANCE = 'REMOVE_BALANCE',
+  ADD_OR_UPDATE_ADDRESS_BALANCE = 'ADD_OR_UPDATE_ADDRESS_BALANCE',
+  INIT_ADDRESS_TOKEN_BALANCES = 'INIT_ADDRESS_TOKEN_BALANCES',
 }
 
 type Action =
-  | { type: ActionType.ADD_ADDRESS; payload: string }
-  | { type: ActionType.REMOVE_ADDRESS; payload: string }
   | {
-      type: ActionType.SET_BALANCES;
-      payload: { address: string; balances: TokenBalance[] };
-    };
+      type: ActionType.ADD_OR_UPDATE_ADDRESS_BALANCE;
+      payload: AddressTokenBalances;
+    }
+  | {
+      type: ActionType.INIT_ADDRESS_TOKEN_BALANCES;
+      payload: AddressTokenBalances[];
+    }
+  | { type: ActionType.REMOVE_BALANCE; payload: string };
 
 const initialState: State = {
-  addresses: [],
-  tokenBalances: {},
+  addressTokenBalances: [],
 };
 
 const TokenBalanceContext = createContext<{
   state: State;
-  dispatch: React.Dispatch<Action>;
+  dispatch: Dispatch<Action>;
 }>({
   state: initialState,
   dispatch: () => null,
@@ -39,36 +52,37 @@ const TokenBalanceContext = createContext<{
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case ActionType.ADD_ADDRESS:
-      return {
-        ...state,
-        addresses: state.addresses.includes(action.payload)
-          ? state.addresses
-          : [...state.addresses, action.payload],
-        tokenBalances: state.tokenBalances[action.payload]
-          ? state.tokenBalances
-          : { ...state.tokenBalances, [action.payload]: [] },
-      };
-    case ActionType.REMOVE_ADDRESS:
-      const { [action.payload]: removed, ...remainingBalances } =
-        state.tokenBalances;
-      return {
-        ...state,
-        addresses: state.addresses.filter(
-          address => address !== action.payload,
-        ),
-        tokenBalances: remainingBalances,
-      };
-    case ActionType.SET_BALANCES:
-      const { address, balances } = action.payload;
-      if (!state.addresses.includes(address)) {
+    case ActionType.ADD_OR_UPDATE_ADDRESS_BALANCE:
+      const existingIndex = state.addressTokenBalances.findIndex(
+        atb => atb.address === action.payload.address,
+      );
+
+      if (existingIndex >= 0) {
+        const updatedAddressTokenBalance = [...state.addressTokenBalances];
+        updatedAddressTokenBalance[existingIndex] = action.payload;
+
+        return { ...state, addressTokenBalances: updatedAddressTokenBalance };
+      } else {
         return {
           ...state,
-          addresses: [...state.addresses, address],
-          tokenBalances: { ...state.tokenBalances, [address]: balances },
+          addressTokenBalances: [...state.addressTokenBalances, action.payload],
         };
       }
-      return state;
+
+    case ActionType.INIT_ADDRESS_TOKEN_BALANCES:
+      return {
+        ...state,
+        addressTokenBalances: action.payload,
+      };
+
+    case ActionType.REMOVE_BALANCE:
+      return {
+        ...state,
+        addressTokenBalances: state.addressTokenBalances.filter(
+          atb => atb.address !== action.payload,
+        ),
+      };
+
     default:
       return state;
   }

@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Box } from '@mui/material';
 
 import { AddressInputModal } from '@/src/components/molecules/AddressInputModal';
 import { AddressTokenBalancesTable } from '@/src/components/organisms/AddressTokenBalancesTable';
 import { PrimaryButton } from '@/src/components/atoms/PrimaryButton';
 import { ActionType, useTokenBalance } from '../context/TokenBalanceContext';
+import {
+  LocalStorageKeys,
+  addAccountBalanceStorage,
+  getFromLocalStorage,
+} from '../services/localStorageService';
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -14,24 +19,37 @@ export default function Home() {
   const handleCloseModal = () => setModalOpen(false);
 
   const handleSubmitAddress = (address: string) => {
-    const tokenBalances = [
-      { name: 'USDC', balance: '1000' },
-      { name: 'USDT', balance: '1500' },
-      { name: 'DAI', balance: '750' },
-    ];
+    const newAddressTokenBalance = {
+      address,
+      balances: [
+        { name: 'USDC', balance: '1000' },
+        { name: 'USDT', balance: '1500' },
+        { name: 'DAI', balance: '750' },
+      ],
+    };
 
     dispatch({
-      type: ActionType.SET_BALANCES,
-      payload: { address, balances: tokenBalances },
+      type: ActionType.ADD_OR_UPDATE_ADDRESS_BALANCE,
+      payload: newAddressTokenBalance,
     });
-
+    addAccountBalanceStorage(newAddressTokenBalance);
     setModalOpen(false);
   };
 
-  const addressTokenBalances = state.addresses.map(address => ({
-    address,
-    balances: state.tokenBalances[address] || [],
-  }));
+  useEffect(() => {
+    const localData = getFromLocalStorage(
+      LocalStorageKeys.UserTokenBalancesByAddress,
+    );
+
+    if (!localData?.length) {
+      return;
+    }
+
+    dispatch({
+      type: ActionType.INIT_ADDRESS_TOKEN_BALANCES,
+      payload: localData,
+    });
+  }, [dispatch]);
 
   return (
     <Container maxWidth="md">
@@ -46,7 +64,7 @@ export default function Home() {
         </PrimaryButton>
 
         <AddressTokenBalancesTable
-          addressTokenBalances={addressTokenBalances}
+          addressTokenBalances={state.addressTokenBalances}
         />
 
         <AddressInputModal

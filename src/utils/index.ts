@@ -1,21 +1,20 @@
-import { AddressTokenBalances } from '@/src/components/organisms/AddressTokenBalancesTable';
+import { AddressTokenBalance } from '@/src/components/organisms/AddressTokenBalancesTable';
 import { TokenBalance } from '@/src/context/TokenBalanceContext';
 
 export const extractTokenNames = (
-  balancesData: AddressTokenBalances[],
+  balancesData: AddressTokenBalance[],
 ): string[] => {
   return Array.from(
     new Set(
       balancesData.flatMap(({ balances }) =>
-        balances.map(balance => balance.name),
+        balances ? balances.map(token => token.name) : [],
       ),
     ),
   );
 };
-
 export const getTokenBalanceByName = (
-  balances: TokenBalance[],
+  balances: TokenBalance[] | undefined,
   name: string,
 ): string => {
-  return balances.find(balance => balance.name === name)?.balance || 'N/A';
+  return balances?.find(token => token.name === name)?.balance ?? 'N/A';
 };
