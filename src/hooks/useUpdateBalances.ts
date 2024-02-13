@@ -1,14 +1,19 @@
 import { useCallback, useEffect } from 'react';
+
 import { useEthereum } from './useEthereum';
 import { ActionType, useTokenBalance } from '../context/TokenBalanceContext';
-import {
-  LocalStorageKeys,
-  saveToLocalStorage,
-} from '../services/localStorageService';
+import { useLocalStorage, LocalStorageKeys } from '../hooks/useLocalStorage';
+
+import { AddressTokenBalance } from '../components/organisms/AddressTokenBalancesTable';
 
 export const useUpdateBalances = () => {
   const { getBalances } = useEthereum();
   const { state, dispatch } = useTokenBalance();
+
+  const [_, setLocalTokenBalances] = useLocalStorage<AddressTokenBalance[]>(
+    LocalStorageKeys.UserTokenBalancesByAddress,
+    [],
+  );
 
   const updateAllBalances = useCallback(async () => {
     try {
@@ -29,11 +34,7 @@ export const useUpdateBalances = () => {
       const updatedBalances = await Promise.all(promises);
       console.warn('updatedBalances', updatedBalances);
 
-      saveToLocalStorage(
-        LocalStorageKeys.UserTokenBalancesByAddress,
-        updatedBalances,
-      );
-
+      setLocalTokenBalances(updatedBalances);
       dispatch({
         type: ActionType.INIT_ADDRESS_TOKEN_BALANCES,
         payload: updatedBalances,
@@ -41,7 +42,12 @@ export const useUpdateBalances = () => {
     } catch (error) {
       console.error('Error updating balances', error);
     }
-  }, [getBalances, state.addressTokenBalances, dispatch]);
+  }, [
+    getBalances,
+    state.addressTokenBalances,
+    dispatch,
+    setLocalTokenBalances,
+  ]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {

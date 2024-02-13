@@ -18,3 +18,10 @@ export const getTokenBalanceByName = (
 ): string => {
   return balances?.find(token => token.name === name)?.balance ?? 'N/A';
 };
+
+export const addressExists = (
+  localTokenBalances: AddressTokenBalance[],
+  address: string,
+): boolean => {
+  return localTokenBalances.some(item => item.address === address);
+};
