@@ -9,6 +9,7 @@ import { styled } from '@mui/material/styles';
 
 import { InputField } from '../atoms/InputField';
 import { PrimaryButton } from '../atoms/PrimaryButton';
+import { isValidAddress } from '@/src/utils/ethUtils';
 
 interface AddressInputModalProps {
   open: boolean;
@@ -22,12 +23,18 @@ export const AddressInputModal: FC<AddressInputModalProps> = ({
   onSubmit,
 }) => {
   const [address, setAddress] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
     setAddress(event.target.value);
   };
 
   const handleSubmit = () => {
+    if (!isValidAddress(address)) {
+      setError('Please enter a valid Ethereum address.');
+      return;
+    }
+
     onSubmit(address);
     onClose();
     setAddress('');
@@ -36,6 +43,7 @@ export const AddressInputModal: FC<AddressInputModalProps> = ({
   const handleClose = () => {
     onClose();
     setAddress('');
+    setError('');
   };
 
   return (
@@ -52,6 +60,8 @@ export const AddressInputModal: FC<AddressInputModalProps> = ({
           variant="outlined"
           value={address}
           onChange={handleAddressChange}
+          error={!!error}
+          helperText={error}
         />
       </DialogContent>
 

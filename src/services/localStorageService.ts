@@ -53,3 +53,17 @@ export const addAccountBalanceStorage = (
     updatedBalances,
   );
 };
+
+export const loadAddressTokenBalances = (): AddressTokenBalance[] => {
+  const storedData: AddressTokenBalance[] | null = getFromLocalStorage(
+    LocalStorageKeys.UserTokenBalancesByAddress,
+  );
+  if (!storedData) {
+    console.error(
+      'No data found in localStorage for key:',
+      LocalStorageKeys.UserTokenBalancesByAddress,
+    );
+    return [];
+  }
+  return storedData;
+};
