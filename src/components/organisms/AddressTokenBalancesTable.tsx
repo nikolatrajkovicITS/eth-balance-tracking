@@ -5,6 +5,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  styled,
 } from '@mui/material';
 
 import { TokenBalance } from '@/src/context/TokenBalanceContext';
@@ -25,16 +26,16 @@ export const AddressTokenBalancesTable: FC<AddressTokenBalanceTableProps> = ({
 }) => {
   if (addressTokenBalances?.length === 0) {
     return (
-      <AppText variant="subtitle1">
+      <StyledAppText variant="subtitle1">
         Add the address of your account to view data or balance.
-      </AppText>
+      </StyledAppText>
     );
   }
 
   const tokenNames = extractTokenNames(addressTokenBalances);
 
   return (
-    <Table>
+    <StyledTable>
       <TableHead>
         <TableRow>
           <TableCell>Address</TableCell>
@@ -58,6 +59,16 @@ export const AddressTokenBalancesTable: FC<AddressTokenBalanceTableProps> = ({
           </TableRow>
         ))}
       </TableBody>
-    </Table>
+    </StyledTable>
   );
 };
+
+const StyledAppText = styled(AppText)(({ theme }) => ({
+  background: theme.palette.grey[400],
+  padding: theme.spacing(2),
+}));
+
+const StyledTable = styled(Table)(({ theme }) => ({
+  background: theme.palette.grey[400],
+  boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
+}));

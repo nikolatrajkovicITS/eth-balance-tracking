@@ -16,7 +16,7 @@ interface BlockchainProviderProps {
   children: ReactNode;
 }
 
-const INFURA_ID: string = process.env.REACT_APP_INFURA_ID || '';
+const INFURA_ID: string = process.env.NEXT_PUBLIC_INFURA_ID || '';
 const INFURA_NETWORK: string = 'homestead';
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(
