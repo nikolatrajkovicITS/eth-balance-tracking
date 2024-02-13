@@ -37,7 +37,7 @@ export const useEthereum = () => {
           contract.balanceOf(address),
           contract.decimals(),
         ]);
-        const formattedBalance = ethers.formatUnits(balance, decimals);
+        const formattedBalance = ethers.utils.formatUnits(balance, decimals);
 
         return {
           symbol: token.symbol,

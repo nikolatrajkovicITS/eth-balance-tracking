@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
 
 export const isValidAddress = (address: string): boolean => {
-  return ethers.isAddress(address);
+  return ethers.utils.isAddress(address);
 };

@@ -1,0 +1,33 @@
+name: Main workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  package-validation:
+    name: Package validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Package audit
+        run: npm audit
+
+  code-validation:
+    name: Code validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Packages
+        run: npm install
+
+      - name: Validate types
+        run: npm run types
+
+      - name: Validate linters
+        run: npm run lint

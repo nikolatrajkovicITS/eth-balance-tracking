@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -9,14 +9,14 @@ import React, {
 import { ethers } from 'ethers';
 
 interface BlockchainContextType {
-  provider: ethers.Provider | null;
+  provider: ethers.providers.Provider | null;
 }
 
 interface BlockchainProviderProps {
   children: ReactNode;
 }
 
-const INFURA_ID: string = '';
+const INFURA_ID: string = process.env.REACT_APP_INFURA_ID || '';
 const INFURA_NETWORK: string = 'homestead';
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(
@@ -26,11 +26,15 @@ const BlockchainContext = createContext<BlockchainContextType | undefined>(
 export const BlockchainProvider: FC<BlockchainProviderProps> = ({
   children,
 }) => {
-  const [provider, setProvider] = useState<ethers.InfuraProvider | null>(null);
+  const [provider, setProvider] =
+    useState<ethers.providers.InfuraProvider | null>(null);
 
   useEffect(() => {
     const initEthers = () => {
-      const provider = new ethers.InfuraProvider(INFURA_NETWORK, INFURA_ID);
+      const provider = new ethers.providers.InfuraProvider(
+        INFURA_NETWORK,
+        INFURA_ID,
+      );
       setProvider(provider);
     };
 
